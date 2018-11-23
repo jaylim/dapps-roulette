@@ -84,7 +84,8 @@ angular.module("app", [])
 		}
 	}
 
-	updateBalance();
+	updateAccountBalance();
+	updateContractBalance();
 
 	function onApproval(address) {
 		$scope.authorized = true;
@@ -135,7 +136,14 @@ angular.module("app", [])
 		});
 	}
 
-	function updateBalance() {
+	function trackAccount() {
+		if (web3.eth.accounts[0] !== $scope.myAddress) {
+			initMyAccount(web3.eth.accounts[0]);
+		}
+		$timeout(trackAccount, 100);
+	}
+
+	function updateAccountBalance() {
 		if ($scope.myAddress) {
 			web3.eth.getBalance($scope.myAddress, function (err, balance) {
 				if (!err) {
@@ -143,17 +151,23 @@ angular.module("app", [])
 						$scope.balance = balance;
 					});
 				}
-				$timeout(updateBalance, 100);
+				$timeout(updateAccountBalance, 100);
 			});
 		} else {
-			$timeout(updateBalance, 100);
+			$timeout(updateAccountBalance, 100);
 		}
 	}
 
-	function trackAccount() {
-		if (web3.eth.accounts[0] !== $scope.myAddress) {
-			initMyAccount(web3.eth.accounts[0]);
+	function updateContractBalance() {
+		if ($window.web3) {
+			web3.eth.getBalance($scope.contractAddress, function (err, balance) {
+				if (!err) {
+					$scope.$apply(function () {
+						$scope.contractBalance = balance;
+					});
+				}
+				$timeout(updateContractBalance, 100);
+			});
 		}
-		$timeout(trackAccount, 100);
 	}
 })

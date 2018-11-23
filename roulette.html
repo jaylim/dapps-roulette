@@ -43,7 +43,8 @@
 	</head>
 	<body>
 		<h1>Roulette Smart Contract</h1>
-		<p>Contract Address: <a ng-href="https://ropsten.etherscan.io/address/{{ contractAddress }}" target="_blank">{{ contractAddress }}</a></p>
+		<p>Contract Address: <blockies value="contractAddress" size="5"></blockies><a ng-href="https://ropsten.etherscan.io/address/{{ contractAddress }}" target="_blank">{{ contractAddress }}</a></p>
+		<p>Contract Balance: {{ contractBalance | fromWei }} Ether</p>
 		<p ng-if="!hasWeb3">No Web3 plugin detected</p>
 		<div ng-if="hasWeb3 && authorized">
 			<p>My Address: <blockies value="myAddress" size="5"></blockies><a ng-href="https://ropsten.etherscan.io/address/{{ myAddress }}" target="_blank">{{ myAddress }}</a></p>
