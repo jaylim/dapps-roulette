@@ -84,6 +84,7 @@ angular.module("app", [])
 		}
 	}
 
+	updateBalance();
 
 	function onApproval(address) {
 		$scope.authorized = true;
@@ -119,13 +120,7 @@ angular.module("app", [])
 		}
 
 		$scope.myAddress = address;
-		web3.eth.getBalance(address, function (err, balance) {
-			$scope.$apply(function () {
-				$scope.balance = balance;
-			});
-		});
-
-		$scope.myHistory  = [];
+		$scope.myHistory = [];
 
 		myBetEvent = roulette.Bet({ player : address }, filter);
 		myBetEvent.watch(function (err, result) {
@@ -138,6 +133,21 @@ angular.module("app", [])
 				$scope.myHistory.splice(0, 0, result);
 			});
 		});
+	}
+
+	function updateBalance() {
+		if ($scope.myAddress) {
+			web3.eth.getBalance($scope.myAddress, function (err, balance) {
+				if (!err) {
+					$scope.$apply(function () {
+						$scope.balance = balance;
+					});
+				}
+				$timeout(updateBalance, 100);
+			});
+		} else {
+			$timeout(updateBalance, 100);
+		}
 	}
 
 	function trackAccount() {
