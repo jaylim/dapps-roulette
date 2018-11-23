@@ -1,6 +1,6 @@
-<html ng-app="roulette" ng-controller="AppCtrl">
+<html ng-app="baccarat" ng-controller="AppCtrl">
 	<head>
-		<title>Test - Roulette</title>
+		<title>Test - Baccarat</title>
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
 		<script src="blockies.min.js"></script>
 		<script src="app.js?v=1.0.0-201811240034"></script>
@@ -42,14 +42,14 @@
 		</style>
 
 		<script type="text/javascript">
-			angular.module("roulette", ["app"])
-			.value("abi", [{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"betType","type":"uint8"},{"name":"betValue","type":"uint8"}],"name":"placeBet","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"player","type":"address"},{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"betType","type":"uint8"},{"indexed":false,"name":"betValue","type":"uint8"},{"indexed":false,"name":"stake","type":"uint256"},{"indexed":false,"name":"payout","type":"uint256"},{"indexed":false,"name":"win","type":"bool"},{"indexed":false,"name":"result","type":"uint8"}],"name":"Bet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"result","type":"uint8"}],"name":"Result","type":"event"}])
-			.value("contractAddress", "0xC90C16393D2d1d4746bfb90369C1F5E6416b71d4")
-			.value("startBlock", 4478172);
+			angular.module("baccarat", ["app"])
+			.value("abi", [{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"betType","type":"uint8"}],"name":"placeBet","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"player","type":"address"},{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"betType","type":"uint8"},{"indexed":false,"name":"stake","type":"uint256"},{"indexed":false,"name":"payout","type":"uint256"},{"indexed":false,"name":"win","type":"bool"},{"indexed":false,"name":"bankerScore","type":"uint8"},{"indexed":false,"name":"playerScore","type":"uint8"},{"indexed":false,"name":"result","type":"uint8[6]"}],"name":"Bet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"bankerScore","type":"uint8"},{"indexed":false,"name":"playerScore","type":"uint8"},{"indexed":false,"name":"result","type":"uint8[6]"}],"name":"Result","type":"event"}])
+			.value("contractAddress", "0x67eD8420579fDf91D72cE0502Fb7Ea677B69ac1d")
+			.value("startBlock", 4480239);
 		</script>
 	</head>
 	<body ng-controller="GameCtrl">
-		<h1>Roulette Smart Contract</h1>
+		<h1>Baccarat Smart Contract</h1>
 		<p>Contract Address: <blockies value="contractAddress" size="5"></blockies><a ng-href="https://ropsten.etherscan.io/address/{{ contractAddress }}" target="_blank">{{ contractAddress }}</a></p>
 		<p>Contract Balance: {{ contractBalance | fromWei }} Ether</p>
 		<p ng-if="!hasWeb3">No Web3 plugin detected</p>

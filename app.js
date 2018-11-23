@@ -1,5 +1,7 @@
 angular.module("app", [])
-.value("rouletteAbi", [{"constant":false,"inputs":[{"name":"amount","type":"uint256"}],"name":"withdraw","outputs":[],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":false,"inputs":[{"name":"betType","type":"uint8"},{"name":"betValue","type":"uint8"}],"name":"placeBet","outputs":[],"payable":true,"stateMutability":"payable","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"payable":true,"stateMutability":"payable","type":"fallback"},{"anonymous":false,"inputs":[{"indexed":true,"name":"player","type":"address"},{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"betType","type":"uint8"},{"indexed":false,"name":"betValue","type":"uint8"},{"indexed":false,"name":"stake","type":"uint256"},{"indexed":false,"name":"payout","type":"uint256"},{"indexed":false,"name":"win","type":"bool"},{"indexed":false,"name":"result","type":"uint8"}],"name":"Bet","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"round","type":"uint256"},{"indexed":false,"name":"result","type":"uint8"}],"name":"Result","type":"event"}])
+.value("abi", [])
+.value("contractAddress", "")
+.value("startBlock", "")
 .filter("fromWei", function ($window) {
 	return function (input, unit) {
 		input = input || "";
@@ -43,46 +45,45 @@ angular.module("app", [])
 		}
 	}
 })
-.controller("AppCtrl", function ($scope, $window, $timeout, rouletteAbi) {
-	$scope.page       = 0;
-	$scope.hasWeb3    = false;
-	$scope.authorized = false;
-	$scope.allHistory = [];
-
-	$scope.contractAddress = "0xC90C16393D2d1d4746bfb90369C1F5E6416b71d4";
-
-	var Roulette, roulette;
-	var myLastTxHash, allLastTxHash;
-	var myBetEvent;
-	var filter = {
-		fromBlock : 4478172,
-		toBlock   : "latest"
-	}
+.controller("AppCtrl", function ($rootScope, $window) {
+	$rootScope.hasWeb3    = false;
+	$rootScope.authorized = false;
 
 	if ($window.web3 && $window.ethereum) {
-		$scope.hasWeb3 = true;
+		$rootScope.hasWeb3 = true;
 		ethereum.enable()
 		.then(function (address) {
-			try {
-				$scope.$apply(function () {
-					onApproval(address);
-				});
-			} catch (e) {
-				console.error(e);
-			}
+			$rootScope.authorized = true;
+			$rootScope.$emit("ethereum", address);
 		})
 		.catch(onReject);
 	} else if ($window.web3 && $window.web3.eth.accounts.length > 0) {
 		// without ethereum plugin
-		$scope.hasWeb3 = true;
-		try {
-			$scope.$apply(function () {
-				onApproval(web3.eth.accounts);
-			});
-		} catch (e) {
-			console.error(e);
-		}
+		$rootScope.hasWeb3    = true;
+		$rootScope.authorized = true;
+		$rootScope.$emit("ethereum", web3.eth.accounts);
 	}
+
+	function onReject(err) {
+		console.log("Request to access wallet failed. ERR: " + err);
+		$window.alert("Request to access wallet failed. ERR: " + err);
+	}
+})
+.controller("GameCtrl", function ($rootScope, $scope, $window, $timeout, abi, contractAddress, startBlock) {
+	$scope.page       = 0;
+	$scope.allHistory = [];
+
+	$scope.contractAddress = contractAddress;
+
+	var Contract, contract;
+	var myLastTxHash, allLastTxHash;
+	var myBetEvent;
+	var filter = {
+		fromBlock : startBlock,
+		toBlock   : "latest"
+	}
+
+	$rootScope.$on("ethereum", onApproval);
 
 	updateAccountBalance();
 	updateContractBalance();
@@ -90,10 +91,10 @@ angular.module("app", [])
 	function onApproval(address) {
 		$scope.authorized = true;
 
-		Roulette = web3.eth.contract(rouletteAbi);
-		roulette = Roulette.at($scope.contractAddress);
+		Contract = web3.eth.contract(abi);
+		contract = Contract.at($scope.contractAddress);
 
-		var globalBetEvent = roulette.Bet({}, filter);
+		var globalBetEvent = contract.Bet({}, filter);
 
 		globalBetEvent.watch(function (err, result) {
 			if (allLastTxHash && allLastTxHash == result.transactionHash) {
@@ -109,11 +110,6 @@ angular.module("app", [])
 		trackAccount();
 	}
 
-	function onReject(err) {
-		console.log("Request to access wallet failed. ERR: " + err);
-		$window.alert("Request to access wallet failed. ERR: " + err);
-	}
-
 	function initMyAccount(address) {
 		if (myBetEvent) {
 			console.log("Stop watching previous event");
@@ -123,7 +119,7 @@ angular.module("app", [])
 		$scope.myAddress = address;
 		$scope.myHistory = [];
 
-		myBetEvent = roulette.Bet({ player : address }, filter);
+		myBetEvent = contract.Bet({ player : address }, filter);
 		myBetEvent.watch(function (err, result) {
 			if (myLastTxHash && myLastTxHash == result.transactionHash) {
 				// skip; duplicate record.
@@ -144,7 +140,7 @@ angular.module("app", [])
 	}
 
 	function updateAccountBalance() {
-		if ($scope.myAddress) {
+		if ($scope.myAddress && $window.web3) {
 			web3.eth.getBalance($scope.myAddress, function (err, balance) {
 				if (!err) {
 					$scope.$apply(function () {
@@ -170,4 +166,4 @@ angular.module("app", [])
 			});
 		}
 	}
-})
+});
