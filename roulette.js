@@ -72,6 +72,16 @@ angular.module("app", [])
 			}
 		})
 		.catch(onReject);
+	} else if ($window.web3 && $window.web3.eth.accounts.length > 0) {
+		// without ethereum plugin
+		$scope.hasWeb3 = true;
+		try {
+			$scope.$apply(function () {
+				onApproval(web3.eth.accounts);
+			});
+		} catch (e) {
+			console.error(e);
+		}
 	}
 
 
