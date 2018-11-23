@@ -72,13 +72,14 @@ angular.module("app", [])
 .controller("GameCtrl", function ($rootScope, $scope, $window, $timeout, abi, contractAddress, startBlock) {
 	$scope.page       = 0;
 	$scope.allHistory = [];
-
+	$scope.leadership = [];
 	$scope.contractAddress = contractAddress;
 
 	var Contract, contract;
 	var myLastTxHash, allLastTxHash;
 	var myBetEvent;
-	var filter = {
+	var userData = {};
+	var filter   = {
 		fromBlock : startBlock,
 		toBlock   : "latest"
 	}
@@ -103,6 +104,22 @@ angular.module("app", [])
 			}
 			allLastTxHash  = result.transactionHash;
 			$scope.$apply(function () {
+				if (!userData[result.args.player]) {
+					userData[result.args.player] = {
+						player      : result.args.player,
+						totalStake  : web3.toBigNumber(0, 10),
+						totalPayout : web3.toBigNumber(0, 10),
+						profitLoss  : web3.toBigNumber(0, 10),
+						totalBets   : 0
+					};
+					$scope.leadership.push(userData[result.args.player]);
+				}
+				var user = userData[result.args.player];
+				user.totalStake  = user.totalStake.add(result.args.stake);
+				user.totalPayout = user.totalPayout.add(result.args.payout);
+				user.profitLoss  = user.totalPayout.minus(user.totalStake);
+				user.totalBets++;
+
 				$scope.allHistory.splice(0, 0, result);
 			});
 		});
