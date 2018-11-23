@@ -1,0 +1,115 @@
+<html ng-app="app" ng-controller="AppCtrl">
+	<head>
+		<title>Test - Roulette</title>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.7.5/angular.min.js"></script>
+		<script src="blockies.min.js"></script>
+		<script src="roulette.js"></script>
+
+		<style type="text/css">
+			body {
+				font-family : Arial, Helvetica, sans-serif;
+			}
+			blockies {
+				margin-right: 5px;
+			}
+			.short-txid {
+				max-width: 100px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				word-wrap: normal;
+			}
+			.short-address {
+				max-width: 200px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				word-wrap: normal;
+				display: inline-block;
+			}
+			table {
+				border-collapse: collapse;
+				border-spacing: 0;
+				border: 1px solid #cdcdcd;
+			}
+			table thead {
+				background-color: #e0e0e0;
+			}
+			table th,
+			table td {
+				border-left: 1px solid #cdcdcd;
+				border-width: 0 0 0 1px;
+				padding: 0.5em 1em;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>Roulette Smart Contract</h1>
+		<p>Contract Address: <a ng-href="https://ropsten.etherscan.io/address/{{ contractAddress }}" target="_blank">{{ contractAddress }}</a></p>
+		<p ng-if="!hasWeb3">No Web3 plugin detected</p>
+		<div ng-if="hasWeb3 && authorized">
+			<p>My Address: <blockies value="myAddress" size="5"></blockies><a ng-href="https://ropsten.etherscan.io/address/{{ myAddress }}" target="_blank">{{ myAddress }}</a></p>
+			<p>Balance: {{ balance.toString() | fromWei }} Ether</p>
+			<ul>
+				<li><a href="javascript:void(0)" ng-click="page = 0">My History</a></li>
+				<li><a href="javascript:void(0)" ng-click="page = 1">All History</a></li>
+			</ul>
+			<div ng-if="page == 0">
+				<h2>My History</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Bet ID.</th>
+							<th>Round</th>
+							<th>Stake (ether)</th>
+							<th>Payout (ether)</th>
+							<th>Win/Lose</th>
+							<th>Result</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="data in myHistory">
+							<td class="short-txid">
+								<a ng-href="https://ropsten.etherscan.io/tx/{{ data.transactionHash }}" target="_blank">{{ data.transactionHash }}</a>
+							</td>
+							<td>{{ data.args.round.toString() }}</td>
+							<td>{{ data.args.stake.toString()  | fromWei }}</td>
+							<td>{{ data.args.payout.toString() | fromWei }}</td>
+							<td>{{ data.args.win | winLose }}</td>
+							<td>{{ data.args.result.toString() }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+			<div ng-if="page == 1">
+				<h2>All History</h2>
+				<table>
+					<thead>
+						<tr>
+							<th>Bet ID.</th>
+							<th>Player</th>
+							<th>Round</th>
+							<th>Stake (ether)</th>
+							<th>Payout (ether)</th>
+							<th>Win/Lose</th>
+							<th>Result</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr ng-repeat="data in allHistory">
+							<td class="short-txid">
+								<a ng-href="https://ropsten.etherscan.io/tx/{{ data.transactionHash }}" target="_blank">{{ data.transactionHash }}</a>
+							</td>
+							<td>
+								<blockies value="data.args.player" size="5"></blockies><div class="short-address"><a ng-href="https://ropsten.etherscan.io/address/{{ data.args.player }}">{{ data.args.player }}</a></div>
+							</td>
+							<td>{{ data.args.round.toString() }}</td>
+							<td>{{ data.args.stake.toString()  | fromWei }}</td>
+							<td>{{ data.args.payout.toString() | fromWei }}</td>
+							<td>{{ data.args.win | winLose }}</td>
+							<td>{{ data.args.result.toString() }}</td>
+						</tr>
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</body>
+</html>
